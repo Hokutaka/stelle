@@ -1,31 +1,39 @@
-import "player.ceru" as player;
+import "battle.ceru" as battle;
 
 fn main() -> void {
     print("Stelle");
+    print("A slime appears!");
 
-    mut hero: player::Player = player::spawn();
+    mut state: battle::Battle = battle::start();
+    battle::show(state);
 
-    print("spawn");
-    player::show(hero);
+    // Cerune has no interactive stdin primitive yet, so this tiny CLI scenario
+    // scripts the commands instead of duplicating the game in another language.
+    print("> attack");
+    state = battle::step(state, battle::Action::Attack {});
+    battle::show(state);
 
-    print("right");
-    hero = player::try_move(hero, player::Direction::Right {});
-    player::show(hero);
+    print("> heal");
+    state = battle::step(state, battle::Action::Heal {});
+    battle::show(state);
 
-    print("down");
-    hero = player::try_move(hero, player::Direction::Down {});
-    player::show(hero);
+    print("> attack");
+    state = battle::step(state, battle::Action::Attack {});
+    battle::show(state);
 
-    // (3, 2) is a wall, so the position should stay (2, 2).
-    print("right (blocked)");
-    hero = player::try_move(hero, player::Direction::Right {});
-    player::show(hero);
+    print("> attack");
+    state = battle::step(state, battle::Action::Attack {});
+    battle::show(state);
 
-    print("down");
-    hero = player::try_move(hero, player::Direction::Down {});
-    player::show(hero);
+    if state.slime_hp <= 0 {
+        print("You win!");
+    }
 
-    print("right");
-    hero = player::try_move(hero, player::Direction::Right {});
-    player::show(hero);
+    if state.hero_hp <= 0 {
+        print("Game over.");
+    }
+
+    if state.escaped {
+        print("You escaped.");
+    }
 }
