@@ -1,0 +1,102 @@
+pub type Battle {
+    hero_hp: i64,
+    slime_hp: i64,
+    potions: i64,
+    escaped: bool,
+}
+
+pub enum Action {
+    Attack,
+    Heal,
+    Run,
+}
+
+pub fn start() -> Battle {
+    return Battle {
+        hero_hp: 10,
+        slime_hp: 12,
+        potions: 1,
+        escaped: false,
+    };
+}
+
+fn clamp_hero_hp(value: i64) -> i64 {
+    if value < 0 {
+        return 0;
+    }
+
+    if value > 10 {
+        return 10;
+    }
+
+    return value;
+}
+
+fn clamp_slime_hp(value: i64) -> i64 {
+    if value < 0 {
+        return 0;
+    }
+
+    return value;
+}
+
+fn enemy_turn(state: Battle) -> Battle {
+    if state.slime_hp <= 0 || state.escaped {
+        return state;
+    }
+
+    print("Slime attacks for 2.");
+
+    return Battle {
+        ..state,
+        hero_hp: clamp_hero_hp(state.hero_hp - 2),
+    };
+}
+
+pub fn step(state: Battle, action: Action) -> Battle {
+    if state.hero_hp <= 0 || state.slime_hp <= 0 || state.escaped {
+        return state;
+    }
+
+    mut next: Battle = state;
+
+    match action {
+        Action::Attack {} => {
+            print("You attack for 4.");
+            next = Battle {
+                ..state,
+                slime_hp: clamp_slime_hp(state.slime_hp - 4),
+            };
+        },
+        Action::Heal {} => {
+            if state.potions > 0 {
+                print("You drink a potion (+3 HP).");
+                next = Battle {
+                    ..state,
+                    hero_hp: clamp_hero_hp(state.hero_hp + 3),
+                    potions: state.potions - 1,
+                };
+            } else {
+                print("No potions left.");
+            }
+        },
+        Action::Run {} => {
+            print("You run away.");
+            next = Battle {
+                ..state,
+                escaped: true,
+            };
+        },
+    }
+
+    return enemy_turn(next);
+}
+
+pub fn show(state: Battle) -> void {
+    print("Hero HP");
+    print(state.hero_hp);
+    print("Slime HP");
+    print(state.slime_hp);
+    print("Potions");
+    print(state.potions);
+}

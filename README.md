@@ -1,16 +1,11 @@
 # Stelle
 
-**Stelle** is a tiny 2D RPG experiment written around
+**Stelle** is a tiny scripted CLI RPG written entirely in
 [Cerune](https://github.com/Hokutaka/Cerune).
 
-The project now has two deliberately separate layers:
+One game, one source of truth. No Rust-side copy of the game logic.
 
-```text
-src/*.ceru       Cerune game core
-host/            native window / input / rendering host
-```
-
-## 1. Run the Cerune core
+## Run
 
 Install Cerune:
 
@@ -27,59 +22,44 @@ cerune check src/main.ceru
 cerune run src/main.ceru
 ```
 
-The Cerune example exercises:
-
-- player state
-- four-direction movement
-- a fixed tile map
-- wall collision
-- modules, product types, enums, and match
-
-## 2. Run the graphical host
-
-```sh
-cargo run --manifest-path host/Cargo.toml
-```
-
-Controls:
-
-- `WASD` or arrow keys: move one tile
-- `Esc`: quit
-
-The host opens a small window, draws the 7x5 map, and renders the player as a
-square.
-
-## Current boundary
-
-Cerune currently has no general real-time host-call / FFI boundary for the game
-loop, so `host/src/game.rs` temporarily mirrors the tiny movement/map rules from
-the Cerune source.
-
-That duplication is intentional and isolated. The target architecture is:
+The demo runs a tiny battle:
 
 ```text
-Cerune
-  Player / World / Battle / Events
-            |
-         Host ABI
-            |
-Rust host
-  Window / Input / Rendering / Audio
+Stelle
+A slime appears!
+...
+> attack
+...
+> heal
+...
 ```
 
-When Cerune grows the required host boundary, `host/src/game.rs` can be replaced
-without rewriting the window/rendering layer.
-
-## Next small milestone
-
-A useful next step is to add a narrow Cerune host ABI with calls shaped roughly
-like:
+## Structure
 
 ```text
-key_down(key)
-draw_rect(x, y, width, height)
-present()
+src/main.ceru      CLI scenario / command source
+src/battle.ceru    battle state and game rules
 ```
 
-or, preferably, expose game-state stepping from Cerune while keeping platform
-effects in the Rust host.
+`battle.ceru` owns the actual RPG state transitions. `main.ceru` only chooses
+which actions happen and prints the resulting state.
+
+## Why the GUI host is gone
+
+The first prototype had a Cerune game core plus a Rust window/input host. Cerune
+currently has no general real-time stdin/host-call boundary, so the Rust host
+ended up mirroring the map and movement rules. That created two implementations
+of the same game.
+
+For this experiment, that is more machinery than the game needs. Stelle now
+backs up to the smallest useful shape: a Cerune-only CLI RPG with no duplicated
+Rust game core.
+
+## Current limitation
+
+Cerune can print values but does not yet expose an interactive stdin primitive,
+so the commands in `src/main.ceru` are scripted for now.
+
+When Cerune gains input, Stelle should only need to replace the scripted action
+source with something like `read_action()`. The battle rules can stay exactly
+where they are in Cerune.
