@@ -1,0 +1,31 @@
+import "player.ceru" as player;
+
+fn main() -> void {
+    print("Stelle");
+
+    mut hero: player::Player = player::spawn();
+
+    print("spawn");
+    player::show(hero);
+
+    print("right");
+    hero = player::try_move(hero, player::Direction::Right {});
+    player::show(hero);
+
+    print("down");
+    hero = player::try_move(hero, player::Direction::Down {});
+    player::show(hero);
+
+    // (3, 2) is a wall, so the position should stay (2, 2).
+    print("right (blocked)");
+    hero = player::try_move(hero, player::Direction::Right {});
+    player::show(hero);
+
+    print("down");
+    hero = player::try_move(hero, player::Direction::Down {});
+    player::show(hero);
+
+    print("right");
+    hero = player::try_move(hero, player::Direction::Right {});
+    player::show(hero);
+}

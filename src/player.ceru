@@ -1,0 +1,55 @@
+import "world.ceru" as world;
+
+pub type Player {
+    x: i64,
+    y: i64,
+}
+
+pub enum Direction {
+    Up,
+    Down,
+    Left,
+    Right,
+}
+
+pub fn spawn() -> Player {
+    return Player {
+        x: 1,
+        y: 1,
+    };
+}
+
+pub fn try_move(player: Player, direction: Direction) -> Player {
+    mut next_x: i64 = player.x;
+    mut next_y: i64 = player.y;
+
+    match direction {
+        Direction::Up {} => {
+            next_y = next_y - 1;
+        },
+        Direction::Down {} => {
+            next_y = next_y + 1;
+        },
+        Direction::Left {} => {
+            next_x = next_x - 1;
+        },
+        Direction::Right {} => {
+            next_x = next_x + 1;
+        },
+    }
+
+    if !world::is_walkable(next_x, next_y) {
+        return player;
+    }
+
+    return Player {
+        ..player,
+        x: next_x,
+        y: next_y,
+    };
+}
+
+pub fn show(player: Player) -> void {
+    print(player.x);
+    print(player.y);
+}

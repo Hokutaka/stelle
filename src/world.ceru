@@ -1,0 +1,28 @@
+pub const WIDTH: i64 = 7;
+pub const HEIGHT: i64 = 5;
+
+pub fn is_walkable(x: i64, y: i64) -> bool {
+    if x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT {
+        return false;
+    }
+
+    // 7 x 5
+    //
+    // #######
+    // #.....#
+    // #..#..#
+    // #.....#
+    // #######
+    //
+    // false = wall, true = walkable
+    tiles: [bool; 35] = [
+        false, false, false, false, false, false, false,
+        false, true,  true,  true,  true,  true,  false,
+        false, true,  true,  false, true,  true,  false,
+        false, true,  true,  true,  true,  true,  false,
+        false, false, false, false, false, false, false,
+    ];
+
+    index: i64 = y * WIDTH + x;
+    return tiles[index];
+}
